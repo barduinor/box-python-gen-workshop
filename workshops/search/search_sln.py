@@ -6,7 +6,7 @@ from box_sdk_gen.client import BoxClient as Client
 
 from box_sdk_gen.schemas import Items, FileMini, FolderMini, WebLinkMini, SearchResults, SearchResultsWithSharedLinks
 
-from box_sdk_gen.managers.search import GetSearchContentTypesArg
+from box_sdk_gen.managers.search import SearchForContentContentTypes
 
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 
@@ -30,13 +30,13 @@ def print_search_results(items: Items):
 def simple_search(
     client: Client,
     query: str,
-    content_types: List[GetSearchContentTypesArg] = None,
+    content_types: List[SearchForContentContentTypes] = None,
     result_type: str = None,
     ancestor_folder_ids: List[str] = None,
 ) -> Union[SearchResults, SearchResultsWithSharedLinks]:
     """Search by query in any Box content"""
 
-    return client.search.get_search(
+    return client.search.search_for_content(
         query=query,
         content_types=content_types,
         type=result_type,

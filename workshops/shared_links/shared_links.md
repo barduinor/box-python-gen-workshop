@@ -101,9 +101,9 @@ The `allow_download` can only be used if the `access` is `open` or `company`
 def file_shared_link_update(
     client: Client,
     file_id: str,
-    shared_link_args: UpdateFileAddSharedLinkSharedLinkArg,
+    shared_link_args: AddShareLinkToFileSharedLink,
 ) -> File:
-    return client.shared_links_files.update_file_add_shared_link(
+    return client.shared_links_files.add_share_link_to_file(
         file_id=file_id, shared_link=shared_link_args, fields=["shared_link"]
     )
 ```
@@ -115,9 +115,9 @@ def main():
     # Make sure file exists
     file = client.files.get_file_by_id(SAMPLE_FILE)
 
-    shared_link_args = UpdateFileAddSharedLinkSharedLinkArg(
-        access=UpdateFileAddSharedLinkSharedLinkArgAccessField.OPEN,
-        permissions=UpdateFileAddSharedLinkSharedLinkArgPermissionsField(
+    shared_link_args = AddShareLinkToFileSharedLink(
+        access=AddShareLinkToFileSharedLinkAccessField.OPEN,
+        permissions=AddShareLinkToFileSharedLinkPermissionsField(
             can_download=True,
             can_preview=True,
         ),
@@ -147,9 +147,9 @@ Let's make a new request to create a shared link with that only allows viewing.
 def main():
     ...
 
-    shared_link_args = UpdateFileAddSharedLinkSharedLinkArg(
-        access=UpdateFileAddSharedLinkSharedLinkArgAccessField.OPEN,
-        permissions=UpdateFileAddSharedLinkSharedLinkArgPermissionsField(
+    shared_link_args = AddShareLinkToFileSharedLink(
+        access=AddShareLinkToFileSharedLinkAccessField.OPEN,
+        permissions=AddShareLinkToFileSharedLinkPermissionsField(
             can_download=False,
             can_preview=True,
         ),
@@ -191,9 +191,9 @@ def main():
     # Make sure the folder exists
     folder = client.folders.get_folder_by_id(SHARED_LINKS_ROOT)
 
-    shared_link_args = UpdateFolderAddSharedLinkSharedLinkArg(
-        access=UpdateFolderAddSharedLinkSharedLinkArgAccessField.OPEN,
-        permissions=UpdateFolderAddSharedLinkSharedLinkArgPermissionsField(
+    shared_link_args = AddShareLinkToFolderSharedLink(
+        access=AddShareLinkToFolderSharedLinkAccessField.OPEN,
+        permissions=AddShareLinkToFolderSharedLinkPermissionsField(
             can_download=True,
             can_preview=True,
         ),
@@ -212,9 +212,9 @@ Again test the folder shared link on your incognito browser:
 Files also have a direct download shared link url, which can be used to download the file directly.
 Update your main method to update the shared link file to alow downloads and print the download url for the file.
 ```python
-shared_link_args = UpdateFileAddSharedLinkSharedLinkArg(
-        access=UpdateFileAddSharedLinkSharedLinkArgAccessField.OPEN,
-        permissions=UpdateFileAddSharedLinkSharedLinkArgPermissionsField(
+shared_link_args = AddShareLinkToFileSharedLink(
+        access=AddShareLinkToFileSharedLinkAccessField.OPEN,
+        permissions=AddShareLinkToFileSharedLinkPermissionsField(
             can_download=True,
             can_preview=True,
         ),
@@ -242,12 +242,12 @@ Let's create methods to do this:
 ```python
 def file_from_shared_link(client: Client, link: str, password: str = None) -> File:
     box_api = f"shared_link={link}&shared_link_password={password}"
-    return client.shared_links_files.get_shared_items(box_api)
+    return client.shared_links_files.find_file_for_shared_link(box_api)
 
 
 def folder_from_shared_link(client: Client, link: str, password: str = None) -> Folder:
     box_api = f"shared_link={link}&shared_link_password={password}"
-    return client.shared_links_folders.get_shared_item_folders(box_api)
+    return client.shared_links_folders.find_folder_for_shared_link(box_api)
 ```
 And test it in your main method:
 ```python

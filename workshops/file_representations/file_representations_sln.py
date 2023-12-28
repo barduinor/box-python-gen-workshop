@@ -6,8 +6,8 @@ import shutil
 from typing import List
 
 from box_sdk_gen.client import BoxClient as Client
-from box_sdk_gen.schemas import File, FileMini, Folder, FileFullRepresentationsFieldEntriesFieldStatusFieldStateField
-from box_sdk_gen.managers.files import GetFileThumbnailByIdExtensionArg
+from box_sdk_gen.schemas import File, FileMini, Folder, FileFullRepresentationsEntriesStatusStateField, FileFullRepresentationsEntriesField
+from box_sdk_gen.managers.files import GetFileThumbnailByIdExtension
 
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 
@@ -30,13 +30,13 @@ def obj_dict(obj):
     return obj.__dict__
 
 
-def file_representations_print(file_name: str, representations: List[dict]):
+def file_representations_print(file_name: str, representations: List[FileFullRepresentationsEntriesField]):
     json_str = json.dumps(representations, indent=4, default=obj_dict)
     print(f"\nFile {file_name} has {len(representations)} representations:\n")
     print(json_str)
 
 
-def file_representations(client: Client, file: File, rep_hints: str = None) -> List[dict]:
+def file_representations(client: Client, file: FileMini, rep_hints: str = None) -> List[FileFullRepresentationsEntriesField]:
     """Get file representations"""
     file = client.files.get_file_by_id(file.id, fields=["name", "representations"], x_rep_hints=rep_hints)
     return file.representations.entries
@@ -48,8 +48,8 @@ def do_request(url: str, access_token: str):
     return resp.content
 
 
-def representation_download(access_token: str, file_representation: str, file_name: str):
-    if file_representation.status.state != FileFullRepresentationsFieldEntriesFieldStatusFieldStateField.SUCCESS:
+def representation_download(access_token: str, file_representation: FileFullRepresentationsEntriesField, file_name: str):
+    if file_representation.status.state != FileFullRepresentationsEntriesStatusStateField.SUCCESS:
         print(f"Representation {file_representation.representation} is not ready")
         return
 
@@ -66,7 +66,7 @@ def representation_download(access_token: str, file_representation: str, file_na
 
 
 def file_thumbnail(
-    client: Client, file: File, extension: GetFileThumbnailByIdExtensionArg, min_h: int, min_w: int
+    client: Client, file: File, extension: GetFileThumbnailByIdExtension, min_h: int, min_w: int
 ) -> bytes:
     """Get file thumbnail"""
     thumbnail = client.files.get_file_thumbnail_by_id(
@@ -113,7 +113,7 @@ def main():
     # access_token = client.auth.retrieve_token().access_token
     # representation_download(access_token, file_docx_representations_png[0], file_docx.name)
 
-    # file_docx_thumbnail = file_thumbnail(client, file_docx, GetFileThumbnailByIdExtensionArg.JPG, min_h=94, min_w=94)
+    # file_docx_thumbnail = file_thumbnail(client, file_docx, GetFileThumbnailByIdExtension.JPG, min_h=94, min_w=94)
 
     # with open(file_docx.name.replace(".", "_").replace(" ", "_") + "_thumbnail.jpg", "wb") as file:
     #     shutil.copyfileobj(file_docx_thumbnail, file)

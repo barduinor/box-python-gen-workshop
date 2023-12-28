@@ -69,7 +69,7 @@ from box_sdk_gen.client import BoxClient as Client
 from box_sdk_gen.fetch import APIException
 from box_sdk_gen.schemas import File, Comment
 
-from box_sdk_gen.managers.comments import CreateCommentItemArg, CreateCommentItemArgTypeField
+from box_sdk_gen.managers.comments import CreateCommentItem, CreateCommentItemTypeField
 
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 
@@ -130,7 +130,7 @@ Create a method to add a comment to a file.
 ```python
 def file_comment_add(client: Client, file: File, message: str) -> Comment:
     """Add a comment to a file"""
-    item_arg = CreateCommentItemArg(id=file.id, type=CreateCommentItemArgTypeField.FILE)
+    item_arg = CreateCommentItem(id=file.id, type=CreateCommentItemTypeField.FILE)
     return client.comments.create_comment(message, item=item_arg)
 ```
 And then add it to the main method:
@@ -164,7 +164,7 @@ You can also specifically reply to a comment. Let's create a reply method:
 ```python
 def file_comment_reply(client: Client, comment: Comment, message: str) -> Comment:
     """Reply to a comment"""
-    item_arg = CreateCommentItemArg(id=comment.id, type=CreateCommentItemArgTypeField.COMMENT)
+    item_arg = CreateCommentItem(id=comment.id, type=CreateCommentItemTypeField.COMMENT)
     return client.comments.create_comment(message, item_arg)
 ```
 and add it to the main method:

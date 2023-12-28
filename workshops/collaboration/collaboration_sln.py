@@ -5,12 +5,12 @@ from box_sdk_gen.client import BoxClient as Client
 from box_sdk_gen.schemas import Collaborations, Collaboration
 
 from box_sdk_gen.managers.user_collaborations import (
-    CreateCollaborationItemArg,
-    CreateCollaborationItemArgTypeField,
-    CreateCollaborationAccessibleByArg,
-    CreateCollaborationAccessibleByArgTypeField,
-    CreateCollaborationRoleArg,
-    UpdateCollaborationByIdRoleArg,
+    CreateCollaborationItem,
+    CreateCollaborationItemTypeField,
+    CreateCollaborationAccessibleBy,
+    CreateCollaborationAccessibleByTypeField,
+    CreateCollaborationRole,
+    UpdateCollaborationByIdRole,
 )
 
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
@@ -28,14 +28,14 @@ def create_file_collaboration(
     client: Client,
     item_id: str,
     user_email: str,
-    role: CreateCollaborationRoleArg,
+    role: CreateCollaborationRole,
 ) -> Collaboration:
-    item = CreateCollaborationItemArg(
-        type=CreateCollaborationItemArgTypeField.FILE,
+    item = CreateCollaborationItem(
+        type=CreateCollaborationItemTypeField.FILE,
         id=item_id,
     )
-    accessible_by = CreateCollaborationAccessibleByArg(
-        type=CreateCollaborationAccessibleByArgTypeField.USER,
+    accessible_by = CreateCollaborationAccessibleBy(
+        type=CreateCollaborationAccessibleByTypeField.USER,
         login=user_email,
     )
 
@@ -87,7 +87,7 @@ def list_file_collaborations(client: Client, file_id: str) -> Collaborations:
 
 
 def update_file_collaboration(
-    client: Client, collaboration_id: str, role: UpdateCollaborationByIdRoleArg
+    client: Client, collaboration_id: str, role: UpdateCollaborationByIdRole
 ) -> Collaboration:
     collaboration = client.user_collaborations.update_collaboration_by_id(
         collaboration_id=collaboration_id,
@@ -115,7 +115,7 @@ def main():
         client=client,
         item_id=SAMPLE_FILE,
         user_email=SAMPLE_EMAIL,
-        role=CreateCollaborationRoleArg.EDITOR,
+        role=CreateCollaborationRole.EDITOR,
     )
     print(f"\nCreated collaboration: {collaboration.id}")
 
@@ -129,7 +129,7 @@ def main():
     collaboration = update_file_collaboration(
         client=client,
         collaboration_id=collaboration.id,
-        role=UpdateCollaborationByIdRoleArg.VIEWER,
+        role=UpdateCollaborationByIdRole.VIEWER,
     )
     print(f"\nUpdated collaboration: {collaboration.id}")
     print_file_collaboration(client=client, collaboration=collaboration)

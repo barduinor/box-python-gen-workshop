@@ -67,7 +67,7 @@ from box_sdk_gen.fetch import APIException
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 from box_sdk_gen.client import BoxClient as Client
 from box_sdk_gen.schemas import Folder, FolderMini, FileMini, WebLinkMini
-from box_sdk_gen.managers.folders import Items, CreateFolderParentArg
+from box_sdk_gen.managers.folders import Items, CreateFolderParent
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("box_sdk_gen").setLevel(logging.CRITICAL)
@@ -202,7 +202,7 @@ def create_box_folder(box_client: Client, folder_name: str, parent_folder: Folde
     """create a folder in box"""
 
     try:
-        parent_arg = CreateFolderParentArg(parent_folder.id)
+        parent_arg = CreateFolderParent(parent_folder.id)
         folder = box_client.folders.create_folder(
             folder_name,
             parent_arg,
@@ -272,7 +272,7 @@ def main():
 
     # copy folder
     try:
-        parent_arg = CreateFolderParentArg(my_documents.id)
+        parent_arg = CreateFolderParent(my_documents.id)
         my_docs_personal = client.folders.copy_folder(personal.id, parent_arg, "personal")
     except APIException as err:
         if err.code == "item_name_in_use":

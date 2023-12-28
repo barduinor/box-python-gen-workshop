@@ -19,10 +19,10 @@ for item in search_results:
 ```
 The search API supports a number of parameters to refine your search via the query method:
 ```python
-    def get_search(
+    def search_for_content(
         self,
         query: Optional[str] = None,
-        scope: Optional[GetSearchScopeArg] = None,
+        scope: Optional[GetSearchScope] = None,
         file_extensions: Optional[List[str]] = None,
         created_at_range: Optional[List[str]] = None,
         updated_at_range: Optional[List[str]] = None,
@@ -30,12 +30,12 @@ The search API supports a number of parameters to refine your search via the que
         owner_user_ids: Optional[List[str]] = None,
         recent_updater_user_ids: Optional[List[str]] = None,
         ancestor_folder_ids: Optional[List[str]] = None,
-        content_types: Optional[List[GetSearchContentTypesArg]] = None,
-        type: Optional[GetSearchTypeArg] = None,
-        trash_content: Optional[GetSearchTrashContentArg] = None,
+        content_types: Optional[List[GetSearchContentTypes]] = None,
+        type: Optional[GetSearchType] = None,
+        trash_content: Optional[GetSearchTrashContent] = None,
         mdfilters: Optional[List[MetadataFilter]] = None,
-        sort: Optional[GetSearchSortArg] = None,
-        direction: Optional[GetSearchDirectionArg] = None,
+        sort: Optional[GetSearchSort] = None,
+        direction: Optional[GetSearchDirection] = None,
         limit: Optional[int] = None,
         include_recent_shared_links: Optional[bool] = None,
         fields: Optional[List[str]] = None,
@@ -108,7 +108,7 @@ from box_sdk_gen.client import BoxClient as Client
 from box_sdk_gen.fetch import APIException
 from box_sdk_gen.schemas import File, Comment
 
-from box_sdk_gen.managers.comments import CreateCommentItemArg, CreateCommentItemArgTypeField
+from box_sdk_gen.managers.comments import CreateCommentItem, CreateCommentItemTypeField
 
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 
@@ -153,7 +153,7 @@ def simple_search(
 ) -> Union[SearchResults, SearchResultsWithSharedLinks]:
     """Search by query in any Box content"""
 
-    return client.search.get_search(
+    return client.search.search_for_content(
         query=query,
     )
 
@@ -271,12 +271,12 @@ Let's modify the search method to accept a parameter that allows the developer t
 def simple_search(
     client: Client,
     query: str,
-    content_types: List[GetSearchContentTypesArg] = None,
+    content_types: List[SearchForContentContentTypes] = None,
 
 ) -> Union[SearchResults, SearchResultsWithSharedLinks]:
     """Search by query in any Box content"""
 
-    return client.search.get_search(
+    return client.search.search_for_content(
         query=query,
         content_types=content_types,
 
@@ -336,13 +336,13 @@ Modify your search method to accept a result_type parameter:
 def simple_search(
     client: Client,
     query: str,
-    content_types: List[GetSearchContentTypesArg] = None,
+    content_types: List[SearchForContentContentTypes] = None,
     result_type: str = None,
 
 ) -> Union[SearchResults, SearchResultsWithSharedLinks]:
     """Search by query in any Box content"""
 
-    return client.search.get_search(
+    return client.search.search_for_content(
         query=query,
         content_types=content_types,
         type=result_type,
@@ -375,13 +375,13 @@ Modify your search method to accept a ancestor_folders parameter:
 def simple_search(
     client: Client,
     query: str,
-    content_types: List[GetSearchContentTypesArg] = None,
+    content_types: List[SearchForContentContentTypes] = None,
     result_type: str = None,
     ancestor_folder_ids: List[str] = None,
 ) -> Union[SearchResults, SearchResultsWithSharedLinks]:
     """Search by query in any Box content"""
 
-    return client.search.get_search(
+    return client.search.search_for_content(
         query=query,
         content_types=content_types,
         type=result_type,

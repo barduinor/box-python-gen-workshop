@@ -63,12 +63,12 @@ import shutil
 from box_sdk_gen.fetch import APIException
 from utils.box_client_oauth import ConfigOAuth, get_client_oauth
 from box_sdk_gen.client import BoxClient as Client
-from box_sdk_gen.schemas import File, FileMini, Folder, FileFullRepresentationsFieldEntriesFieldStatusFieldStateField
-from box_sdk_gen.managers.files import GetFileThumbnailByIdExtensionArg
+from box_sdk_gen.schemas import File, Files, FileMini, Folder, FileFullRepresentationsEntriesStatusStateField
+from box_sdk_gen.managers.files import GetFileThumbnailByIdExtension
 from box_sdk_gen.managers.uploads import (
-    PreflightFileUploadParentArg,
-    UploadFileAttributesArg,
-    UploadFileAttributesArgParentField,
+    PreflightFileUploadCheckParent,
+    UploadFileAttributes,
+    UploadFileAttributesParentField,
 )
 from box_sdk_gen.utils import ByteStream
 
@@ -97,9 +97,9 @@ def upload_file(client: Client, file_path: str, folder_id: str) -> File:
     """Upload a file to a Box folder"""
 
     # upload new file
-    upload_arg = UploadFileAttributesArg(
-        file_name, UploadFileAttributesArgParentField(folder_id))
-    files: File = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
+    upload_arg = UploadFileAttributes(
+        file_name, UploadFileAttributesParentField(folder_id))
+    files: Files = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
     box_file = files.entries[0]
 
     return box_file
@@ -131,8 +131,8 @@ def upload_file(client: Client, file_path: str, folder_id: str) -> File:
 
     try:
         # upload new file
-        upload_arg = UploadFileAttributesArg(file_name, UploadFileAttributesArgParentField(folder_id))
-        files: File = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
+        upload_arg = UploadFileAttributes(file_name, UploadFileAttributesParentField(folder_id))
+        files: Files = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
         box_file = files.entries[0]
     except APIException as err:
         if err.code == "item_name_in_use":
@@ -140,8 +140,8 @@ def upload_file(client: Client, file_path: str, folder_id: str) -> File:
             box_file_id = err.context_info["conflicts"]["id"]
             try:
                 # upload new version
-                upload_arg = UploadFileAttributesArg(file_name, UploadFileAttributesArgParentField(folder_id))
-                files: File = client.uploads.upload_file_version(box_file_id, upload_arg, file=open(file_path, "rb"))
+                upload_arg = UploadFileAttributes(file_name, UploadFileAttributesParentField(folder_id))
+                files: Files = client.uploads.upload_file_version(box_file_id, upload_arg, file=open(file_path, "rb"))
                 box_file = files.entries[0]
             except APIException as err2:
                 logging.error("Failed to update %s: %s", box_file.name, err2)
@@ -171,12 +171,12 @@ def upload_file(client: Client, file_path: str, folder_id: str) -> File:
 
     try:
         # pre-flight check
-        pre_flight_arg = PreflightFileUploadParentArg(id=folder_id)
-        client.uploads.preflight_file_upload(file_name, file_size, pre_flight_arg)
+        pre_flight_arg = PreflightFileUploadCheckParent(id=folder_id)
+        client.uploads.preflight_file_upload_check(file_name, file_size, pre_flight_arg)
 
         # upload new file
-        upload_arg = UploadFileAttributesArg(file_name, UploadFileAttributesArgParentField(folder_id))
-        files: File = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
+        upload_arg = UploadFileAttributes(file_name, UploadFileAttributesParentField(folder_id))
+        files: Files = client.uploads.upload_file(upload_arg, file=open(file_path, "rb"))
         box_file = files.entries[0]
     except APIException as err:
         if err.code == "item_name_in_use":
@@ -184,8 +184,8 @@ def upload_file(client: Client, file_path: str, folder_id: str) -> File:
             box_file_id = err.context_info["conflicts"]["id"]
             try:
                 # upload new version
-                upload_arg = UploadFileAttributesArg(file_name, UploadFileAttributesArgParentField(folder_id))
-                files: File = client.uploads.upload_file_version(box_file_id, upload_arg, file=open(file_path, "rb"))
+                upload_arg = UploadFileAttributes(file_name, UploadFileAttributesParentField(folder_id))
+                files: Files = client.uploads.upload_file_version(box_file_id, upload_arg, file=open(file_path, "rb"))
                 box_file = files.entries[0]
             except APIException as err2:
                 logging.error("Failed to update %s: %s", box_file.name, err2)

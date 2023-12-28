@@ -4,12 +4,12 @@ import os
 import logging
 
 from box_sdk_gen.client import BoxClient as Client
-from box_sdk_gen.schemas import Folder, File
-from box_sdk_gen.managers.folders import CreateFolderParentArg
+from box_sdk_gen.schemas import Folder, File, Files
+from box_sdk_gen.managers.folders import CreateFolderParent
 from box_sdk_gen.managers.uploads import (
-    PreflightFileUploadParentArg,
-    UploadFileAttributesArg,
-    UploadFileAttributesArgParentField,
+    PreflightFileUploadCheckParent,
+    UploadFileAttributes,
+    UploadFileAttributesParentField,
 )
 from box_sdk_gen.fetch import APIException
 
@@ -23,7 +23,7 @@ def create_box_folder(
 
     try:
         folder = client.folders.create_folder(
-            folder_name, CreateFolderParentArg(id=parent_folder.id)
+            folder_name, CreateFolderParent(id=parent_folder.id)
         )
     except APIException as err:
         if err.code == "item_name_in_use":
@@ -51,9 +51,9 @@ def folder_upload(
                 client, item.name, box_base_folder
             )
             logging.info(" Folder %s", item.name)
-            folder_upload(client, new_box_folder, item)
+            folder_upload(client, new_box_folder, str(item))
         else:
-            file = file_upload(client, item, box_base_folder)
+            file = file_upload(client, str(item), box_base_folder)
             logging.info(
                 " \tUploaded %s (%s) %s bytes", file.name, file.id, file.size
             )
@@ -68,8 +68,8 @@ def file_upload(client: Client, file_path: str, folder: Folder) -> File:
     file_name = os.path.basename(file_path)
     file_id = None
     try:
-        pre_flight_arg = PreflightFileUploadParentArg(id=folder.id)
-        client.uploads.preflight_file_upload(
+        pre_flight_arg = PreflightFileUploadCheckParent(id=folder.id)
+        client.uploads.preflight_file_upload_check(
             file_name, file_size, pre_flight_arg
         )
     except APIException as err:
@@ -78,18 +78,18 @@ def file_upload(client: Client, file_path: str, folder: Folder) -> File:
         else:
             raise err
 
-    upload_arg = UploadFileAttributesArg(
-        file_name, UploadFileAttributesArgParentField(folder.id)
+    upload_arg = UploadFileAttributes(
+        file_name, UploadFileAttributesParentField(folder.id)
     )
     if file_id is None:
         # upload new file
-        files: File = client.uploads.upload_file(
+        files: Files = client.uploads.upload_file(
             upload_arg, file=open(file_path, "rb")
         )
         file = files.entries[0]
     else:
         # upload new version
-        files: File = client.uploads.upload_file_version(
+        files: Files = client.uploads.upload_file_version(
             file_id, upload_arg, file=open(file_path, "rb")
         )
         file = files.entries[0]
